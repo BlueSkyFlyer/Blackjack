@@ -5,6 +5,8 @@ require 'pry'
 #2. Extract out major nouns; these are your classes.
 #3. Extract out major verbs; these are your behaviors/methods. 
 
+# Card and Deck classes
+
 class Card
 	attr_accessor :suit, :face_value
 
@@ -31,8 +33,6 @@ class Card
   end
 end
 
-
-
 class Deck
 attr_accessor :cards
 
@@ -54,15 +54,11 @@ attr_accessor :cards
   end
 
   def deal_one
-  	cards.pop 
+    cards.pop 
   end
 
   def size
   	cards.size
-  end
-
-  def show_cards # Not correct/ not working
-  	"Deck: #{@cards}"
   end
 
   def self.total_decks
@@ -70,29 +66,77 @@ attr_accessor :cards
   end
 end
 
+# Make a new Hand
 
-class Player
-  attr_accessor :hand, :value
-
-  def initialize
-  	@hand = []
-  	@value = 0
-  end
-
-
-end
-
-
-class Dealer
-	attr_accessor :hand, :value
+module Hand
+	attr_accessor :cards, :total
 
 	def initialize
-		@hand = []
-		@value = 0
+		@total = 0
+		@cards = []
 	end
 
+	def calculate_total
+  # [['H', '3'], ['S'. 'Q'], ...]
+    arr = @cards.map{ |e| e[1] }
 
+    arr.each do |value|
+      if value == "A"
+    	  total += 11
+      elsif value.to_i == 0 # J, Q, K
+    	  total += 10
+      else
+      	total += value.to_i
+      end
+    end
+
+    # correct for aces
+
+    arr.select{ |e| e == "A" }.count.times do
+      if total > 21
+    	  total -= 10
+      end
+    end
+
+    total
+  end
 end
+
+# Person, Player, and Dealer methods
+
+class Person
+	include Hand
+	attr_accessor :name
+
+	def initialize(name)
+		@name = name
+		@hand = Hand.new
+	end
+end
+
+class Player < Person
+
+  def hit
+
+  end
+
+  def stay
+
+  end
+end
+
+
+class Dealer < Person
+
+	def hit
+
+	end
+
+	def stay
+
+	end
+end
+
 
 # Engine
 
@@ -114,16 +158,13 @@ class Blackjack
 		who_won?
 		play_again?
 	end
-
-
 end
 
-c1 = Card.new('H', '3')
-c2 = Card.new('D', '4')
-
-c1.pretty_output
-c2.pretty_output
-
 deck = Deck.new
-binding.pry
+Jack = Player.new('Jack')
+Sam = Dealer.new('Sam')
+
+
+
+
 
