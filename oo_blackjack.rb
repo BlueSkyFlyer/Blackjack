@@ -100,6 +100,10 @@ module Hand
 
     total
   end
+
+  def cards
+  	@cards
+  end
 end
 
 # Person, Player, and Dealer methods
