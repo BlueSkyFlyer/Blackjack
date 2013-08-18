@@ -16,7 +16,7 @@ class Card
   end
 
   def pretty_output
-  	puts "The #{face_value} of #{find_suit}"
+    "The #{face_value} of #{find_suit}"
   end
 
   def find_suit
@@ -73,27 +73,24 @@ module Hand
 
 	def initialize
 		@total = 0
-		@cards = []
 	end
 
-	def calculate_total
+	def total
   # [['H', '3'], ['S'. 'Q'], ...]
-    arr = @cards.map{ |e| e[1] }
+    face_values = @cards.map{ |card| card.face_value}
 
-    arr.each do |value|
+    total = 0
+    face_values.each do |value|
       if value == "A"
     	  total += 11
-      elsif value.to_i == 0 # J, Q, K
-    	  total += 10
       else
-      	total += value.to_i
-      end
+      	total += (value.to_i == 0 ? 10 : value.to_i)
     end
 
     # correct for aces
 
-    arr.select{ |e| e == "A" }.count.times do
-      if total > 21
+    face_values.select{ |value| value == "A" }.count.times do
+        break if total <= 21
     	  total -= 10
       end
     end
@@ -101,44 +98,46 @@ module Hand
     total
   end
 
-  def cards
-  	@cards
+  def show_hand
+  	puts "---- #{name}'s Hand ----"
+    cards.each do |card|
+      puts "=> #{card}"
+    end
+
+    puts "=> Total: #{total}"
+  end
+
+  def add_card(new_card)
+    cards << new_card
+  end
+
+  def is_busted?
+    total > 21
   end
 end
 
-# Person, Player, and Dealer methods
+#  Player and Dealer methods
 
-class Person
-	include Hand
-	attr_accessor :name
 
-	def initialize(name)
-		@name = name
-		@hand = Hand.new
-	end
-end
+class Player 
+  include Hand
+  attr_accessor :name, :cards
 
-class Player < Person
-
-  def hit
-
-  end
-
-  def stay
-
+  def initialize(name)
+    @name = name
+    @cards = []
   end
 end
 
 
-class Dealer < Person
+class Dealer 
+  include Hand
+  attr_accessor :name, :cards
 
-	def hit
-
-	end
-
-	def stay
-
-	end
+  def initialize
+    @name = "Dealer"
+    @cards = []
+  end
 end
 
 
@@ -165,8 +164,17 @@ class Blackjack
 end
 
 deck = Deck.new
-Jack = Player.new('Jack')
-Sam = Dealer.new('Sam')
+
+player = Player.new('Jack')
+player.add_card(deck.deal_one)
+player.add_card(deck.deal_one)
+player.show_hand
+
+
+dealer = Dealer.new
+dealer.add_card(deck.deal_one)
+dealer.add_card(deck.deal_one)
+dealer.show_hand
 
 
 
